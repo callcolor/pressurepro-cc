@@ -1,6 +1,8 @@
 import { Conference } from '@/types/conference';
+import { prisma } from '@/lib/prisma';
 
-// Mock data for development - simulates a database of tech conferences
+// Mock data for development - now using Prisma for persistence
+// This file is kept for backward compatibility and helper functions
 export const mockConferences: Conference[] = [
   {
     id: '1',
@@ -220,13 +222,22 @@ export const mockConferences: Conference[] = [
   },
 ];
 
-// Helper to get all unique categories
-export function getAllCategories(): string[] {
-  const categories = new Set<string>();
-  mockConferences.forEach((conf) => {
-    conf.category.forEach((cat) => categories.add(cat));
-  });
-  return Array.from(categories).sort();
+// Helper to get all unique categories from database
+export async function getAllCategories(): Promise<string[]> {
+  try {
+    const categories = await prisma.category.findMany({
+      orderBy: { name: 'asc' },
+    });
+    return categories.map((c) => c.name);
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    // Fallback to mock data
+    const categories = new Set<string>();
+    mockConferences.forEach((conf) => {
+      conf.category.forEach((cat) => categories.add(cat));
+    });
+    return Array.from(categories).sort();
+  }
 }
 
 // Helper to get price range

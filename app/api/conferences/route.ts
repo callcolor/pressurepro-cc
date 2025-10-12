@@ -1,77 +1,103 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { mockConferences } from '@/lib/mockData';
-import { Conference, ConferenceFilters } from '@/types/conference';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 // GET /api/conferences - Get all conferences with optional filtering
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
 
-    // Parse filters from query parameters
-    const filters: ConferenceFilters = {
-      searchTerm: searchParams.get('search') || undefined,
-      dateRange: {
-        start: searchParams.get('dateStart') || undefined,
-        end: searchParams.get('dateEnd') || undefined,
-      },
-      categories: searchParams.get('categories')?.split(',').filter(Boolean) || undefined,
-      priceRange: {
-        min: searchParams.get('priceMin') ? Number(searchParams.get('priceMin')) : undefined,
-        max: searchParams.get('priceMax') ? Number(searchParams.get('priceMax')) : undefined,
-      },
-    };
+    // Build where clause for filtering
+    const where: Prisma.ConferenceWhereInput = {};
 
-    let filtered = [...mockConferences];
-
-    // Apply search filter
-    if (filters.searchTerm) {
-      const term = filters.searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        (conf) =>
-          conf.name.toLowerCase().includes(term) ||
-          conf.description.toLowerCase().includes(term) ||
-          conf.location.toLowerCase().includes(term)
-      );
+    // Search filter
+    const searchTerm = searchParams.get('search');
+    if (searchTerm) {
+      where.OR = [
+        { name: { contains: searchTerm, mode: 'insensitive' } },
+        { description: { contains: searchTerm, mode: 'insensitive' } },
+        { location: { contains: searchTerm, mode: 'insensitive' } },
+      ];
     }
 
-    // Apply date range filter
-    if (filters.dateRange?.start) {
-      filtered = filtered.filter((conf) => conf.date >= filters.dateRange!.start!);
-    }
-    if (filters.dateRange?.end) {
-      filtered = filtered.filter((conf) => conf.date <= filters.dateRange!.end!);
-    }
-
-    // Apply category filter
-    if (filters.categories && filters.categories.length > 0) {
-      filtered = filtered.filter((conf) =>
-        conf.category.some((cat) => filters.categories!.includes(cat))
-      );
+    // Date range filter
+    const dateStart = searchParams.get('dateStart');
+    const dateEnd = searchParams.get('dateEnd');
+    if (dateStart || dateEnd) {
+      where.date = {};
+      if (dateStart) where.date.gte = new Date(dateStart);
+      if (dateEnd) where.date.lte = new Date(dateEnd);
     }
 
-    // Apply price range filter
-    if (filters.priceRange?.min !== undefined) {
-      filtered = filtered.filter((conf) => conf.price >= filters.priceRange!.min!);
+    // Category filter
+    const categoriesParam = searchParams.get('categories');
+    if (categoriesParam) {
+      const categoryNames = categoriesParam.split(',').filter(Boolean);
+      where.categories = {
+        some: {
+          category: {
+            name: { in: categoryNames },
+          },
+        },
+      };
     }
-    if (filters.priceRange?.max !== undefined) {
-      filtered = filtered.filter((conf) => conf.price <= filters.priceRange!.max!);
+
+    // Price range filter
+    const priceMin = searchParams.get('priceMin');
+    const priceMax = searchParams.get('priceMax');
+    if (priceMin || priceMax) {
+      where.price = {};
+      if (priceMin) where.price.gte = Number(priceMin);
+      if (priceMax) where.price.lte = Number(priceMax);
     }
 
     // Pagination
     const page = Number(searchParams.get('page')) || 1;
     const limit = Number(searchParams.get('limit')) || 12;
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
+    const skip = (page - 1) * limit;
 
-    const paginatedResults = filtered.slice(startIndex, endIndex);
+    // Fetch conferences with relations
+    const [conferences, total] = await Promise.all([
+      prisma.conference.findMany({
+        where,
+        include: {
+          speakers: true,
+          categories: {
+            include: {
+              category: true,
+            },
+          },
+        },
+        orderBy: [{ isFeatured: 'desc' }, { date: 'asc' }],
+        skip,
+        take: limit,
+      }),
+      prisma.conference.count({ where }),
+    ]);
+
+    // Transform data to match frontend interface
+    const transformedConferences = conferences.map((conf) => ({
+      id: conf.id,
+      name: conf.name,
+      description: conf.description,
+      date: conf.date.toISOString().split('T')[0],
+      location: conf.location,
+      price: conf.price,
+      category: conf.categories.map((c) => c.category.name),
+      imageUrl: conf.imageUrl,
+      speakers: conf.speakers,
+      maxAttendees: conf.maxAttendees,
+      currentAttendees: conf.currentAttendees,
+      isFeatured: conf.isFeatured,
+    }));
 
     return NextResponse.json({
-      conferences: paginatedResults,
+      conferences: transformedConferences,
       pagination: {
         page,
         limit,
-        total: filtered.length,
-        totalPages: Math.ceil(filtered.length / limit),
+        total,
+        totalPages: Math.ceil(total / limit),
       },
     });
   } catch (error) {
@@ -83,7 +109,7 @@ export async function GET(request: NextRequest) {
 // POST /api/conferences - Create a new conference (admin)
 export async function POST(request: NextRequest) {
   try {
-    const body: Conference = await request.json();
+    const body = await request.json();
 
     // Validate required fields
     if (!body.name || !body.date || !body.location) {
@@ -93,19 +119,59 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // In a real app, this would save to a database
-    // For now, we'll just return the created conference with a generated ID
-    const newConference: Conference = {
-      ...body,
-      id: `conf-${Date.now()}`,
-      currentAttendees: body.currentAttendees || 0,
-      isFeatured: body.isFeatured || false,
-    };
+    // Get or create categories
+    const categoryNames = body.category || [];
+    const categories = await Promise.all(
+      categoryNames.map(async (name: string) => {
+        const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        return prisma.category.upsert({
+          where: { slug },
+          update: {},
+          create: { name, slug },
+        });
+      })
+    );
 
-    // Simulate adding to our mock data (note: this won't persist in this implementation)
-    mockConferences.push(newConference);
+    // Create conference with speakers and categories
+    const conference = await prisma.conference.create({
+      data: {
+        name: body.name,
+        description: body.description,
+        date: new Date(body.date),
+        location: body.location,
+        price: body.price,
+        imageUrl: body.imageUrl,
+        maxAttendees: body.maxAttendees,
+        currentAttendees: body.currentAttendees || 0,
+        isFeatured: body.isFeatured || false,
+        speakers: body.speakers
+          ? {
+              create: body.speakers.map((speaker: any) => ({
+                name: speaker.name,
+                title: speaker.title,
+                company: speaker.company,
+                bio: speaker.bio,
+                avatarUrl: speaker.avatarUrl,
+              })),
+            }
+          : undefined,
+        categories: {
+          create: categories.map((category) => ({
+            categoryId: category.id,
+          })),
+        },
+      },
+      include: {
+        speakers: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+    });
 
-    return NextResponse.json(newConference, { status: 201 });
+    return NextResponse.json(conference, { status: 201 });
   } catch (error) {
     console.error('Error creating conference:', error);
     return NextResponse.json({ error: 'Failed to create conference' }, { status: 500 });

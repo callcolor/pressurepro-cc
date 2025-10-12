@@ -1,0 +1,131 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for managing user accounts and preferences
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  registrations UserRegistration[]
+  favorites     UserFavorite[]
+
+  @@map("users")
+}
+
+// Conference model - main entity for tech conferences
+model Conference {
+  id               String   @id @default(cuid())
+  name             String
+  description      String   @db.Text
+  date             DateTime
+  location         String
+  price            Float
+  imageUrl         String?
+  maxAttendees     Int
+  currentAttendees Int      @default(0)
+  isFeatured       Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  speakers      Speaker[]
+  categories    ConferenceCategory[]
+  registrations UserRegistration[]
+  favorites     UserFavorite[]
+
+  @@index([date])
+  @@index([isFeatured])
+  @@map("conferences")
+}
+
+// Speaker model for conference speakers
+model Speaker {
+  id          String  @id @default(cuid())
+  name        String
+  title       String
+  company     String
+  bio         String  @db.Text
+  avatarUrl   String?
+  conferenceId String
+
+  // Relations
+  conference Conference @relation(fields: [conferenceId], references: [id], onDelete: Cascade)
+
+  @@index([conferenceId])
+  @@map("speakers")
+}
+
+// Category model for conference topics/tags
+model Category {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+
+  // Relations
+  conferences ConferenceCategory[]
+
+  @@map("categories")
+}
+
+// Join table for many-to-many relationship between Conference and Category
+model ConferenceCategory {
+  conferenceId String
+  categoryId   String
+
+  conference Conference @relation(fields: [conferenceId], references: [id], onDelete: Cascade)
+  category   Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([conferenceId, categoryId])
+  @@index([conferenceId])
+  @@index([categoryId])
+  @@map("conference_categories")
+}
+
+// User registration for conferences
+model UserRegistration {
+  id            String   @id @default(cuid())
+  userId        String
+  conferenceId  String
+  attendeeName  String
+  email         String
+  registeredAt  DateTime @default(now())
+
+  // Relations
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conference Conference @relation(fields: [conferenceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, conferenceId])
+  @@index([userId])
+  @@index([conferenceId])
+  @@map("user_registrations")
+}
+
+// User favorites for conferences
+model UserFavorite {
+  id           String   @id @default(cuid())
+  userId       String
+  conferenceId String
+  createdAt    DateTime @default(now())
+
+  // Relations
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conference Conference @relation(fields: [conferenceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, conferenceId])
+  @@index([userId])
+  @@index([conferenceId])
+  @@map("user_favorites")
+}

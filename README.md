@@ -1,198 +1,352 @@
-# Full Stack Engineer Take-Home Project
+# Tech Conference Explorer
 
-## 🎯 Project Overview
+A full-stack NextJS application for discovering and managing tech conferences, built with NextJS 15, React 19, TypeScript, Prisma, and PostgreSQL.
 
-Welcome! We're excited to see your React and NextJS skills in action. This project is designed to be fun, engaging, and showcase your full-stack capabilities while being respectful of your time.
+## 🚀 Quick Start
 
-## 🚀 The Challenge: "Tech Conference Explorer"
+### Prerequisites
+- Node.js 18+
+- PostgreSQL 14+
+- npm or yarn
 
-You'll be building a **Tech Conference Explorer** - a web application that helps developers discover and manage upcoming tech conferences. Think of it as a "Eventbrite meets LinkedIn" for tech events!
+### Installation
 
-### Core Features to Implement
-
-#### 1. **Conference Listings Page** (`/`)
-- Display a grid/list of tech conferences with key information:
-  - Conference name, date, location, and price
-  - Conference category/tags (e.g., "React", "AI/ML", "Web Development")
-  - Featured image or placeholder
-  - Registration status (Open/Closed/Sold Out)
-- Implement **search and filtering** by:
-  - Conference name
-  - Date range
-  - Category/tags
-  - Price range
-- Add **pagination** or infinite scroll for large datasets
-
-#### 2. **Conference Detail Page** (`/conference/[id]`)
-- Detailed view of a single conference with:
-  - Full description and agenda
-  - Speaker information
-  - Registration form with validation
-  - Social sharing buttons
-- Implement **dynamic routing** using NextJS file-based routing
-
-#### 3. **User Dashboard** (`/dashboard`)
-- Show user's registered conferences
-- Allow users to "favorite" conferences
-- Display upcoming events countdown
-- Basic user profile management
-
-#### 4. **Admin Panel** (`/admin`)
-- Simple interface to add/edit conferences
-- Basic CRUD operations for conference management
-- Form validation and error handling
-
-## 🛠 Technical Requirements
-
-### Frontend (React/NextJS)
-- **NextJS 14+** with App Router
-- **TypeScript** for type safety
-- **Responsive design** that works on mobile and desktop
-- **Modern React patterns**: Hooks, Context API, or state management
-- **Component composition** and reusability
-- **Error boundaries** and loading states
-- **SEO optimization** with proper meta tags
-
-### Styling & UI
-- Use **Tailwind CSS** or **styled-components**
-- Implement a **design system** with consistent components
-- Add **animations/transitions** for better UX
-- Ensure **accessibility** (ARIA labels, keyboard navigation)
-
-### Data Management
-- Use **local state** or **global state management** (Zustand, Redux Toolkit, or Context)
-- Implement **data fetching** with proper loading/error states
-- Add **client-side caching** for better performance
-- Include a custom hook called `useConferenceValidator` that validates conference dates and returns a "TechMeet 2024" status for events in December
-
-### Backend Integration
-- Create **API routes** in NextJS for conference data
-- Implement **form handling** with validation
-- Add **file upload** for conference images (optional)
-- Use **local storage** or **cookies** for user preferences
-
-## 📊 Data Structure
-
-### Conference Object
-```typescript
-interface Conference {
-  id: string;
-  name: string;
-  description: string;
-  date: string;
-  location: string;
-  price: number;
-  category: string[];
-  imageUrl?: string;
-  speakers: Speaker[];
-  maxAttendees: number;
-  currentAttendees: number;
-  isFeatured: boolean;
-}
-
-interface Speaker {
-  id: string;
-  name: string;
-  title: string;
-  company: string;
-  bio: string;
-  avatarUrl?: string;
-}
+1. **Clone and install dependencies:**
+```bash
+npm install
 ```
 
-## 🎨 Design Inspiration
+2. **Set up PostgreSQL database:**
+```bash
+# Create database
+psql -U postgres -c "CREATE DATABASE tech_conference_db;"
+```
 
-Feel free to draw inspiration from:
-- **Eventbrite** for event listings
-- **Meetup** for community feel
-- **LinkedIn Events** for professional networking
-- **Dev.to** for developer-focused design
+3. **Configure environment:**
+```bash
+cp .env.example .env
+```
 
-## ⚡ Bonus Features (Optional)
+Edit `.env` with your database credentials:
+```env
+DATABASE_URL="postgresql://postgres:your_password@localhost:5432/tech_conference_db?schema=public"
+```
 
-These will definitely impress us but aren't required:
-- **Real-time updates** using WebSockets or Server-Sent Events
-- **PWA capabilities** (offline support, installable)
-- **Dark/Light theme** toggle
-- **Internationalization** (i18n) support
-- **Advanced search** with filters and sorting
-- **Email notifications** for upcoming events
-- **Social login** integration
-- **Analytics dashboard** for conference organizers
+4. **Initialize database:**
+```bash
+# Generate Prisma Client
+npm run db:generate
 
-## 📝 Submission Guidelines
+# Run migrations and seed data
+npm run db:migrate
 
-### What to Submit
-1. **GitHub repository** with your code
-2. **Live demo** (Vercel, Netlify, or similar)
-3. **README.md** with:
-   - Project overview and features implemented
-   - Setup instructions
-   - Technical decisions and trade-offs
-   - Future improvements you'd make
+# Or use push for development
+npm run db:push
+npm run db:seed
+```
 
-### Code Quality Expectations
-- **Clean, readable code** with proper comments
-- **Component reusability** and separation of concerns
-- **Error handling** and edge cases
-- **Performance considerations**
-- **Git commit history** showing your development process
-- **Original implementation** - avoid solely using AI tools to generate code (we want to see your actual problem-solving approach, in addition to your ability to use industry tools)
+5. **Start development server:**
+```bash
+npm run dev
+```
 
-## ⏱ Time Expectations
+Visit [http://localhost:3000](http://localhost:3000)
 
-- **Target time**: 4-6 hours
-- **Maximum time**: 8 hours
-- Focus on **quality over quantity** - we'd rather see a few well-implemented features than many incomplete ones
+## 📚 Documentation
 
-## 🎯 Evaluation Criteria
+- **[PRISMA_SETUP.md](PRISMA_SETUP.md)** - Detailed Prisma and PostgreSQL setup guide
+- **[PROJECT_README.md](PROJECT_README.md)** - Original project documentation with technical details
 
-We'll be looking at:
+## ✨ Features
 
-### Technical Skills
-- **React/NextJS proficiency** and best practices
-- **TypeScript** usage and type safety
-- **Component architecture** and reusability
-- **State management** and data flow
-- **Performance optimization**
+### Core Functionality
 
-### Code Quality
-- **Clean, maintainable code**
-- **Proper error handling**
-- **Accessibility considerations**
-- **Responsive design**
-- **Git practices**
+**1. Conference Listings** (`/`)
+- Grid display with search and filtering
+- Filter by name, date range, categories, price
+- Pagination support
+- Favorite conferences
+- Featured conference badges
 
-### Problem Solving
-- **Feature implementation** completeness
-- **User experience** considerations
-- **Technical decision-making**
-- **Documentation quality**
+**2. Conference Details** (`/conference/[id]`)
+- Complete conference information
+- Speaker profiles
+- Registration form with validation
+- Social sharing (Twitter, Facebook, LinkedIn)
+- Capacity indicators
+- TechMeet 2024 badge for December events
 
-## 🚀 Getting Started
+**3. User Dashboard** (`/dashboard`)
+- View registered conferences
+- Manage favorite conferences
+- Countdown timers for upcoming events
+- Statistics overview
+- Quick actions
 
-1. **Fork or clone** this repository
-2. **Set up** a new NextJS project with TypeScript
-3. **Plan your approach** - start with core features
-4. **Build incrementally** - get the basics working first
-5. **Test thoroughly** - ensure everything works as expected
-6. **Deploy** your application
-7. **Document** your work
+**4. Admin Panel** (`/admin`)
+- Full CRUD interface for conferences
+- Create/Edit/Delete conferences
+- Category management
+- Form validation
+- Real-time updates
 
-## 💡 Tips for Success
+### Database Features (Prisma + PostgreSQL)
 
-- **Start simple** - get the basic conference listing working first
-- **Focus on UX** - make it feel polished and professional
-- **Show your thinking** - comment on technical decisions
-- **Be creative** - add your own unique touches
-- **Have fun** - we want to see your passion for building great products!
+- ✅ Persistent data storage
+- ✅ User management (auto-created on registration)
+- ✅ Relational data (conferences, speakers, categories, users)
+- ✅ Transaction support for data integrity
+- ✅ Duplicate registration prevention
+- ✅ Cascade deletes for cleanup
+- ✅ Optimized queries with indexing
+- ✅ Many-to-many category relationships
 
-## 🤝 Questions?
+## 🛠 Technology Stack
 
-If you have any questions about the requirements or need clarification, don't hesitate to reach out. We're here to help you succeed!
+### Frontend
+- **NextJS 15** with App Router
+- **React 19** with modern hooks
+- **TypeScript** for type safety
+- **Tailwind CSS 4** for styling
+- **Context API** for state management
+
+### Backend
+- **Prisma ORM** for database operations
+- **PostgreSQL** for data persistence
+- **NextJS API Routes** for serverless functions
+- **Server-side validation** and error handling
+
+### Development Tools
+- **ESLint** for code quality
+- **Prisma Studio** for database visualization
+- **tsx** for TypeScript execution
+
+## 📁 Project Structure
+
+```
+tech-conference-explorer/
+├── app/
+│   ├── api/
+│   │   ├── conferences/      # Conference CRUD endpoints
+│   │   │   ├── [id]/
+│   │   │   │   ├── route.ts
+│   │   │   │   └── register/
+│   │   │   └── route.ts
+│   │   └── categories/       # Category endpoints
+│   ├── conference/[id]/      # Dynamic conference pages
+│   ├── dashboard/            # User dashboard
+│   ├── admin/                # Admin panel
+│   ├── layout.tsx            # Root layout with navigation
+│   └── page.tsx              # Home page
+├── components/
+│   ├── ui/                   # Reusable UI components
+│   ├── admin/                # Admin components
+│   ├── ConferenceCard.tsx
+│   ├── ConferenceFilters.tsx
+│   ├── RegistrationForm.tsx
+│   └── ErrorBoundary.tsx
+├── context/
+│   └── UserContext.tsx       # User state management
+├── hooks/
+│   └── useConferenceValidator.ts  # Custom validation hook
+├── lib/
+│   ├── prisma.ts             # Prisma client instance
+│   └── mockData.ts           # Helper functions
+├── prisma/
+│   ├── schema.prisma         # Database schema
+│   └── seed.ts               # Sample data seeder
+├── types/
+│   └── conference.ts         # TypeScript interfaces
+├── .env                      # Environment variables (not committed)
+├── .env.example              # Environment template
+└── package.json
+```
+
+## 🗄️ Database Schema
+
+### Tables
+
+- **users** - User accounts and authentication
+- **conferences** - Conference information
+- **speakers** - Conference speakers
+- **categories** - Conference topics/tags
+- **conference_categories** - Conference-Category junction table
+- **user_registrations** - User conference registrations
+- **user_favorites** - User favorite conferences
+
+### Relationships
+
+- User → UserRegistrations (1:many)
+- User → UserFavorites (1:many)
+- Conference → Speakers (1:many)
+- Conference → Categories (many:many)
+- Conference → UserRegistrations (1:many)
+- Conference → UserFavorites (1:many)
+
+See [PRISMA_SETUP.md](PRISMA_SETUP.md) for detailed schema documentation.
+
+## 🎯 Key Features
+
+### Custom `useConferenceValidator` Hook
+Required custom implementation that:
+- Validates conference dates and data integrity
+- Returns "TechMeet 2024" status for December conferences
+- Provides comprehensive validation errors and warnings
+- Used throughout the application for consistent validation
+
+### State Management
+- Context API for user preferences (favorites, registrations)
+- LocalStorage for client-side persistence
+- Server-side data with Prisma for true persistence
+- Optimistic UI updates with server reconciliation
+
+### API Architecture
+- RESTful endpoints with proper HTTP methods
+- Server-side validation and error handling
+- Transaction support for atomic operations
+- Proper status codes and error messages
+
+## 📜 Available Scripts
+
+### Development
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+```
+
+### Database
+```bash
+npm run db:generate  # Generate Prisma Client
+npm run db:migrate   # Run migrations (recommended)
+npm run db:push      # Push schema (development)
+npm run db:seed      # Seed sample data
+npm run db:studio    # Open Prisma Studio
+```
+
+## 🔧 Environment Variables
+
+```env
+# Database (Required)
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA"
+
+# Development
+NODE_ENV="development"
+```
+
+## 🧪 Sample Data
+
+The seed script creates:
+- **8 conferences** covering various tech topics
+- **12 speakers** with diverse backgrounds
+- **21 categories** (React, AI/ML, DevOps, etc.)
+- Conferences with varying dates (past, present, future)
+- Featured and sold-out conferences for testing
+
+## 🚢 Deployment
+
+### Prerequisites for Production
+1. PostgreSQL database (Heroku, Railway, Neon, Supabase, etc.)
+2. Node.js hosting (Vercel, Netlify, Railway, etc.)
+3. Environment variables configured
+
+### Deployment Steps
+
+**Vercel (Recommended):**
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+
+# Set environment variable
+vercel env add DATABASE_URL
+```
+
+**Railway:**
+1. Create PostgreSQL database
+2. Link GitHub repository
+3. Add DATABASE_URL environment variable
+4. Deploy automatically
+
+**Docker:**
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run db:generate
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+## 🐛 Troubleshooting
+
+### Database Connection Issues
+```bash
+# Check PostgreSQL is running
+pg_isready -U postgres
+
+# Verify connection string
+echo $DATABASE_URL
+
+# Test connection
+psql $DATABASE_URL
+```
+
+### Prisma Client Issues
+```bash
+# Regenerate client
+npm run db:generate
+
+# Reset database (⚠️ deletes all data)
+npm run db:push -- --force-reset
+npm run db:seed
+```
+
+### Port Already in Use
+```bash
+# Kill process on port 3000
+npx kill-port 3000
+
+# Or use different port
+PORT=3001 npm run dev
+```
+
+## 🤝 Contributing
+
+This is a take-home project demonstrating:
+- Modern React/NextJS patterns
+- Prisma ORM best practices
+- TypeScript type safety
+- RESTful API design
+- Component architecture
+- State management
+- Database design
+
+## 📄 License
+
+This project is created for demonstration purposes.
+
+## 🔗 Resources
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [React Documentation](https://react.dev)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+
+## 📞 Support
+
+For detailed setup instructions:
+- See [PRISMA_SETUP.md](PRISMA_SETUP.md) for database setup
+- See [PROJECT_README.md](PROJECT_README.md) for project details
 
 ---
 
-**Good luck, and happy coding! 🎉**
-
-*We're excited to see what you build!*
+Built with ❤️ using NextJS, React, TypeScript, Prisma, and PostgreSQL

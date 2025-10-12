@@ -6,10 +6,10 @@ import { ConferenceCard } from '@/components/ConferenceCard';
 import { ConferenceFilters as Filters } from '@/components/ConferenceFilters';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Button } from '@/components/ui/Button';
-import { getAllCategories } from '@/lib/mockData';
 
 export default function Home() {
   const [conferences, setConferences] = useState<Conference[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<ConferenceFilters>({});
@@ -17,11 +17,20 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
 
-  const categories = getAllCategories();
-
   useEffect(() => {
+    fetchCategories();
     fetchConferences();
   }, [filters, page]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories');
+      const data = await response.json();
+      setCategories(data.categories || []);
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+    }
+  };
 
   const fetchConferences = async () => {
     try {
