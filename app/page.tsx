@@ -1,103 +1,157 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Conference, ConferenceFilters } from '@/types/conference';
+import { ConferenceCard } from '@/components/ConferenceCard';
+import { ConferenceFilters as Filters } from '@/components/ConferenceFilters';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { Button } from '@/components/ui/Button';
+import { getAllCategories } from '@/lib/mockData';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [conferences, setConferences] = useState<Conference[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState<ConferenceFilters>({});
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [showFilters, setShowFilters] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const categories = getAllCategories();
+
+  useEffect(() => {
+    fetchConferences();
+  }, [filters, page]);
+
+  const fetchConferences = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '12',
+        ...(filters.searchTerm && { search: filters.searchTerm }),
+        ...(filters.dateRange?.start && { dateStart: filters.dateRange.start }),
+        ...(filters.dateRange?.end && { dateEnd: filters.dateRange.end }),
+        ...(filters.categories?.length && { categories: filters.categories.join(',') }),
+        ...(filters.priceRange?.min !== undefined && { priceMin: filters.priceRange.min.toString() }),
+        ...(filters.priceRange?.max !== undefined && { priceMax: filters.priceRange.max.toString() }),
+      });
+
+      const response = await fetch(`/api/conferences?${params}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch conferences');
+      }
+
+      const data = await response.json();
+      setConferences(data.conferences);
+      setTotalPages(data.pagination.totalPages);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFilterChange = (newFilters: ConferenceFilters) => {
+    setFilters(newFilters);
+    setPage(1); // Reset to first page when filters change
+  };
+
+  return (
+    <div className="bg-gray-50 min-h-screen">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            Discover Tech Conferences
+          </h1>
+          <p className="text-xl text-blue-100">
+            Find and register for the best tech events worldwide
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Filters Sidebar */}
+          <aside className="lg:w-80 flex-shrink-0">
+            <div className="lg:hidden mb-4">
+              <Button
+                onClick={() => setShowFilters(!showFilters)}
+                fullWidth
+                variant="outline"
+              >
+                {showFilters ? 'Hide Filters' : 'Show Filters'}
+              </Button>
+            </div>
+            <div className={`${showFilters ? 'block' : 'hidden'} lg:block`}>
+              <Filters onFilterChange={handleFilterChange} categories={categories} />
+            </div>
+          </aside>
+
+          {/* Conference Grid */}
+          <div className="flex-1">
+            {loading ? (
+              <div className="flex justify-center items-center py-20">
+                <LoadingSpinner size="lg" />
+              </div>
+            ) : error ? (
+              <div className="text-center py-20">
+                <p className="text-red-600 text-lg">{error}</p>
+                <Button onClick={fetchConferences} className="mt-4">
+                  Try Again
+                </Button>
+              </div>
+            ) : conferences.length === 0 ? (
+              <div className="text-center py-20">
+                <p className="text-gray-600 text-lg">No conferences found matching your criteria.</p>
+                <Button onClick={() => handleFilterChange({})} className="mt-4" variant="outline">
+                  Clear Filters
+                </Button>
+              </div>
+            ) : (
+              <>
+                <div className="mb-4 flex justify-between items-center">
+                  <p className="text-gray-600">
+                    Showing {conferences.length} conference{conferences.length !== 1 ? 's' : ''}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {conferences.map((conference) => (
+                    <ConferenceCard key={conference.id} conference={conference} />
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex justify-center items-center gap-2 mt-8">
+                    <Button
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                      variant="outline"
+                    >
+                      Previous
+                    </Button>
+                    <span className="text-gray-700 px-4">
+                      Page {page} of {totalPages}
+                    </span>
+                    <Button
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={page === totalPages}
+                      variant="outline"
+                    >
+                      Next
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
