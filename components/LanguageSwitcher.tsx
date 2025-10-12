@@ -2,8 +2,8 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 import { useTransition } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { locales, type Locale } from '@/i18n/locales';
+import { useRouter, usePathname } from '@/i18n/navigation';
+import { type Locale } from '@/i18n/locales';
 
 export function LanguageSwitcher() {
   const locale = useLocale();
@@ -17,18 +17,8 @@ export function LanguageSwitcher() {
       // Store locale preference
       document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
 
-      // Update URL with new locale
-      const segments = pathname.split('/');
-      const currentLocaleInPath = locales.includes(segments[1] as Locale) ? segments[1] : null;
-
-      if (currentLocaleInPath) {
-        segments[1] = newLocale;
-      } else {
-        segments.splice(1, 0, newLocale);
-      }
-
-      router.push(segments.join('/'));
-      router.refresh();
+      // Use next-intl's router which handles locale switching automatically
+      router.replace(pathname, { locale: newLocale });
     });
   };
 

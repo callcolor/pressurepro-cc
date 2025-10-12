@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import { UserProvider } from "@/context/UserContext";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { notFound } from 'next/navigation';
+import { locales } from '@/i18n/locales';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,15 +24,23 @@ export const metadata: Metadata = {
   description: "Discover and manage upcoming tech conferences",
 };
 
-export default async function RootLayout({
-  children,
-}: Readonly<{
+type Props = {
   children: React.ReactNode;
-}>) {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function RootLayout({ children, params }: Props) {
+  const { locale } = await params;
+
+  // Ensure that the incoming `locale` is valid
+  if (!locales.includes(locale as (typeof locales)[number])) {
+    notFound();
+  }
+
   const messages = await getMessages();
 
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

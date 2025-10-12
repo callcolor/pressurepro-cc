@@ -9,7 +9,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { RegistrationForm } from '@/components/RegistrationForm';
 import { useUser } from '@/context/UserContext';
 import { useConferenceValidator, getRegistrationStatus } from '@/hooks/useConferenceValidator';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 

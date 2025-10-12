@@ -1,13 +1,14 @@
 import { getRequestConfig } from 'next-intl/server';
-import { headers } from 'next/headers';
+import { locales } from './locales';
 
-export const locales = ['en', 'es'] as const;
-export type Locale = (typeof locales)[number];
+export default getRequestConfig(async ({ requestLocale }) => {
+  // This typically corresponds to the `[locale]` segment in the pathname
+  let locale = await requestLocale;
 
-export default getRequestConfig(async () => {
-  // Get locale from headers or default to 'en'
-  const headersList = await headers();
-  const locale = headersList.get('x-locale') || 'en';
+  // Ensure that a valid locale is used
+  if (!locale || !locales.includes(locale as (typeof locales)[number])) {
+    locale = 'en';
+  }
 
   return {
     locale,
