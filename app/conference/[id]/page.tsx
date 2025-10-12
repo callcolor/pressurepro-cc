@@ -1,8 +1,8 @@
-'use client';
+ 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useCallback } from 'react';
 import { Conference } from '@/types/conference';
-import { Card, CardBody, CardHeader, CardFooter } from '@/components/ui/Card';
+import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
@@ -10,12 +10,15 @@ import { RegistrationForm } from '@/components/RegistrationForm';
 import { useUser } from '@/context/UserContext';
 import { useConferenceValidator, getRegistrationStatus } from '@/hooks/useConferenceValidator';
 import Link from 'next/link';
+import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
 export default function ConferenceDetailPage({ params }: PageProps) {
+  const t = useTranslations('conference');
   const resolvedParams = use(params);
   const [conference, setConference] = useState<Conference | null>(null);
   const [loading, setLoading] = useState(true);
@@ -26,11 +29,7 @@ export default function ConferenceDetailPage({ params }: PageProps) {
   const validation = useConferenceValidator(conference);
   const status = conference ? getRegistrationStatus(conference) : 'Closed';
 
-  useEffect(() => {
-    fetchConference();
-  }, [resolvedParams.id]);
-
-  const fetchConference = async () => {
+  const fetchConference = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/conferences/${resolvedParams.id}`);
@@ -47,7 +46,11 @@ export default function ConferenceDetailPage({ params }: PageProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [resolvedParams.id]);
+
+  useEffect(() => {
+    fetchConference();
+  }, [fetchConference]);
 
   const handleFavoriteToggle = () => {
     if (!conference) return;
@@ -102,10 +105,10 @@ export default function ConferenceDetailPage({ params }: PageProps) {
   if (error || !conference) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Conference Not Found</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">{t('conferenceNotFound') || 'Conference Not Found'}</h1>
         <p className="text-gray-600 mb-8">{error}</p>
         <Link href="/">
-          <Button>Back to Conferences</Button>
+          <Button>{t('backToConferences')}</Button>
         </Link>
       </div>
     );
@@ -124,7 +127,7 @@ export default function ConferenceDetailPage({ params }: PageProps) {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Button */}
         <Link href="/" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-6">
-          <span className="mr-2">←</span> Back to Conferences
+          <span className="mr-2">←</span> {t('backToConferences')}
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -134,11 +137,7 @@ export default function ConferenceDetailPage({ params }: PageProps) {
             <Card>
               <div className="relative h-80 bg-gray-200">
                 {conference.imageUrl ? (
-                  <img
-                    src={conference.imageUrl}
-                    alt={conference.name}
-                    className="w-full h-full object-cover"
-                  />
+                  <Image src={conference.imageUrl} alt={conference.name} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
                     <span className="text-6xl">📊</span>
@@ -158,7 +157,7 @@ export default function ConferenceDetailPage({ params }: PageProps) {
                     <Badge variant={statusVariant[status]}>{status}</Badge>
                     {validation.isTechMeet2024 && (
                       <Badge variant="info" className="ml-2">
-                        🎉 TechMeet 2024 Special
+                        🎉 {t('techMeet2024')}
                       </Badge>
                     )}
                   </div>
@@ -196,12 +195,12 @@ export default function ConferenceDetailPage({ params }: PageProps) {
                 </div>
 
                 <div className="border-t pt-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-3">About This Conference</h2>
+                  <h2 className="text-xl font-bold text-gray-900 mb-3">{t('aboutThisConference')}</h2>
                   <p className="text-gray-700 leading-relaxed whitespace-pre-line">{conference.description}</p>
                 </div>
 
                 <div className="border-t pt-6 mt-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">Categories</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-3">{t('categories')}</h3>
                   <div className="flex flex-wrap gap-2">
                     {conference.category.map((cat) => (
                       <Badge key={cat} variant="info">
@@ -212,7 +211,7 @@ export default function ConferenceDetailPage({ params }: PageProps) {
                 </div>
 
                 <div className="border-t pt-6 mt-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">Capacity</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-3">{t('capacity')}</h3>
                   <div className="flex items-center gap-4">
                     <span className="text-2xl">👥</span>
                     <div>
@@ -246,10 +245,12 @@ export default function ConferenceDetailPage({ params }: PageProps) {
                       <div key={speaker.id} className="flex gap-4">
                         <div className="flex-shrink-0">
                           {speaker.avatarUrl ? (
-                            <img
+                            <Image
                               src={speaker.avatarUrl}
                               alt={speaker.name}
-                              className="w-16 h-16 rounded-full object-cover"
+                              width={64}
+                              height={64}
+                              className="rounded-full object-cover"
                             />
                           ) : (
                             <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xl font-bold">
@@ -309,7 +310,7 @@ export default function ConferenceDetailPage({ params }: PageProps) {
                     <div className="text-center py-4">
                       <div className="text-4xl mb-3">✅</div>
                       <p className="text-green-700 font-medium mb-4">
-                        You're registered for this conference!
+                        {t('alreadyRegistered')}
                       </p>
                       <Link href="/dashboard">
                         <Button fullWidth>View Dashboard</Button>

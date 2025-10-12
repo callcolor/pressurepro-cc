@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Conference, Speaker } from '@/types/conference';
+import { Conference } from '@/types/conference';
+import { useTranslations } from 'next-intl';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 
@@ -12,6 +13,7 @@ interface ConferenceFormProps {
 }
 
 export function ConferenceForm({ conference, onSubmit, onCancel }: ConferenceFormProps) {
+  const t = useTranslations('admin.form');
   const [formData, setFormData] = useState<Partial<Conference>>({
     name: '',
     description: '',
@@ -111,7 +113,7 @@ export function ConferenceForm({ conference, onSubmit, onCancel }: ConferenceFor
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Input
-        label="Conference Name"
+        label={t('conferenceName')}
         type="text"
         value={formData.name}
         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -120,7 +122,7 @@ export function ConferenceForm({ conference, onSubmit, onCancel }: ConferenceFor
       />
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+  <label className="block text-sm font-medium text-gray-700 mb-1">{t('description')}</label>
         <textarea
           className={`w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
             errors.description ? 'border-red-500' : 'border-gray-300'
@@ -137,7 +139,7 @@ export function ConferenceForm({ conference, onSubmit, onCancel }: ConferenceFor
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
-          label="Date"
+          label={t('date')}
           type="date"
           value={formData.date}
           onChange={(e) => setFormData({ ...formData, date: e.target.value })}
@@ -146,7 +148,7 @@ export function ConferenceForm({ conference, onSubmit, onCancel }: ConferenceFor
         />
 
         <Input
-          label="Location"
+          label={t('location')}
           type="text"
           value={formData.location}
           onChange={(e) => setFormData({ ...formData, location: e.target.value })}
@@ -157,7 +159,7 @@ export function ConferenceForm({ conference, onSubmit, onCancel }: ConferenceFor
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
-          label="Price ($)"
+          label={t('price')}
           type="number"
           value={formData.price}
           onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
@@ -167,7 +169,7 @@ export function ConferenceForm({ conference, onSubmit, onCancel }: ConferenceFor
         />
 
         <Input
-          label="Max Attendees"
+          label={t('maxAttendees')}
           type="number"
           value={formData.maxAttendees}
           onChange={(e) => setFormData({ ...formData, maxAttendees: Number(e.target.value) })}
@@ -190,11 +192,11 @@ export function ConferenceForm({ conference, onSubmit, onCancel }: ConferenceFor
       )}
 
       <Input
-        label="Image URL"
+        label={t('imageUrl')}
         type="url"
         value={formData.imageUrl}
         onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-        helperText="Enter a URL for the conference image"
+        helperText={t('imageUrlHelper')}
       />
 
       <div>
@@ -202,7 +204,7 @@ export function ConferenceForm({ conference, onSubmit, onCancel }: ConferenceFor
         <div className="flex gap-2 mb-2">
           <Input
             type="text"
-            placeholder="Add category (e.g., React, AI/ML)"
+            placeholder={t('addCategory')}
             value={categoryInput}
             onChange={(e) => setCategoryInput(e.target.value)}
             onKeyPress={(e) => {

@@ -1,19 +1,22 @@
-'use client';
+ 'use client';
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Conference } from '@/types/conference';
 import { Card, CardBody, CardFooter } from './ui/Card';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
 import { useUser } from '@/context/UserContext';
 import { getRegistrationStatus } from '@/hooks/useConferenceValidator';
+import { useTranslations } from 'next-intl';
 
 interface ConferenceCardProps {
   conference: Conference;
 }
 
 export function ConferenceCard({ conference }: ConferenceCardProps) {
+  const t = useTranslations();
   const { isFavorite, addFavorite, removeFavorite } = useUser();
   const isConferenceFavorite = isFavorite(conference.id);
   const status = getRegistrationStatus(conference);
@@ -48,10 +51,12 @@ export function ConferenceCard({ conference }: ConferenceCardProps) {
         {/* Image */}
         <div className="relative h-48 bg-gray-200 overflow-hidden">
           {conference.imageUrl ? (
-            <img
+            <Image
               src={conference.imageUrl}
               alt={conference.name}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 33vw"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -61,7 +66,7 @@ export function ConferenceCard({ conference }: ConferenceCardProps) {
           {conference.isFeatured && (
             <div className="absolute top-2 left-2">
               <Badge variant="warning" size="sm">
-                ⭐ Featured
+                ⭐ {t('conference.featured')}
               </Badge>
             </div>
           )}
@@ -97,7 +102,10 @@ export function ConferenceCard({ conference }: ConferenceCardProps) {
             <div className="flex items-center text-sm text-gray-600">
               <span className="mr-2">👥</span>
               <span>
-                {conference.currentAttendees} / {conference.maxAttendees} attendees
+                {t('conference.attendees', {
+                  current: conference.currentAttendees,
+                  max: conference.maxAttendees,
+                })}
               </span>
             </div>
           </div>
@@ -119,7 +127,7 @@ export function ConferenceCard({ conference }: ConferenceCardProps) {
         <CardFooter className="flex items-center justify-between">
           <span className="text-2xl font-bold text-blue-600">${conference.price}</span>
           <Button size="sm" variant="primary">
-            View Details
+            {t('conference.viewDetails')}
           </Button>
         </CardFooter>
       </Card>

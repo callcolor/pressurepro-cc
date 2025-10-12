@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Conference } from '@/types/conference';
+import Image from 'next/image';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -11,18 +13,13 @@ import { ConferenceForm } from '@/components/admin/ConferenceForm';
 type ViewMode = 'list' | 'create' | 'edit';
 
 export default function AdminPage() {
+  const t = useTranslations();
   const [conferences, setConferences] = useState<Conference[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedConference, setSelectedConference] = useState<Conference | undefined>();
 
-  useEffect(() => {
-    if (viewMode === 'list') {
-      fetchConferences();
-    }
-  }, [viewMode]);
-
-  const fetchConferences = async () => {
+  const fetchConferences = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch('/api/conferences?limit=100');
@@ -33,7 +30,13 @@ export default function AdminPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (viewMode === 'list') {
+      fetchConferences();
+    }
+  }, [viewMode, fetchConferences]);
 
   const handleCreate = async (conferenceData: Partial<Conference>) => {
     const response = await fetch('/api/conferences', {
@@ -106,11 +109,11 @@ export default function AdminPage() {
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Panel</h1>
-            <p className="text-gray-600">Manage tech conferences</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('admin.title')}</h1>
+            <p className="text-gray-600">{t('admin.subtitle')}</p>
           </div>
           {viewMode === 'list' && (
-            <Button onClick={() => setViewMode('create')}>+ Create Conference</Button>
+            <Button onClick={() => setViewMode('create')}>+ {t('admin.createConference')}</Button>
           )}
         </div>
 
@@ -119,7 +122,7 @@ export default function AdminPage() {
           <Card>
             <CardHeader>
               <h2 className="text-2xl font-bold text-gray-900">
-                {viewMode === 'create' ? 'Create New Conference' : 'Edit Conference'}
+                {viewMode === 'create' ? t('admin.createNew') : t('admin.editConference')}
               </h2>
             </CardHeader>
             <CardBody>
@@ -145,9 +148,7 @@ export default function AdminPage() {
             ) : (
               <>
                 <div className="mb-4">
-                  <p className="text-gray-600">
-                    Total: {conferences.length} conference{conferences.length !== 1 ? 's' : ''}
-                  </p>
+                  <p className="text-gray-600">{t('admin.total', { count: conferences.length })}</p>
                 </div>
 
                 <div className="space-y-4">
@@ -159,11 +160,15 @@ export default function AdminPage() {
                           <div className="flex-shrink-0">
                             <div className="w-32 h-32 bg-gray-200 rounded-lg overflow-hidden">
                               {conference.imageUrl ? (
-                                <img
-                                  src={conference.imageUrl}
-                                  alt={conference.name}
-                                  className="w-full h-full object-cover"
-                                />
+                                <div className="relative w-full h-full">
+                                  <Image
+                                    src={conference.imageUrl}
+                                    alt={conference.name}
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 1024px) 100vw, 200px"
+                                  />
+                                </div>
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center text-gray-400">
                                   <span className="text-3xl">📊</span>
@@ -200,24 +205,20 @@ export default function AdminPage() {
 
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
                               <div className="text-sm">
-                                <span className="text-gray-500">Date:</span>
+                                <span className="text-gray-500">{t('conference.date')}:</span>
                                 <div className="font-medium">{formatDate(conference.date)}</div>
                               </div>
                               <div className="text-sm">
-                                <span className="text-gray-500">Location:</span>
+                                <span className="text-gray-500">{t('conference.location')}:</span>
                                 <div className="font-medium">{conference.location}</div>
                               </div>
                               <div className="text-sm">
-                                <span className="text-gray-500">Price:</span>
-                                <div className="font-medium text-blue-600">
-                                  ${conference.price}
-                                </div>
+                                <span className="text-gray-500">{t('conference.price')}:</span>
+                                <div className="font-medium text-blue-600">${conference.price}</div>
                               </div>
                               <div className="text-sm">
-                                <span className="text-gray-500">Attendees:</span>
-                                <div className="font-medium">
-                                  {conference.currentAttendees} / {conference.maxAttendees}
-                                </div>
+                                <span className="text-gray-500">{t('conference.attendees').split('{')[0] || 'Attendees'}:</span>
+                                <div className="font-medium">{conference.currentAttendees} / {conference.maxAttendees}</div>
                               </div>
                             </div>
 

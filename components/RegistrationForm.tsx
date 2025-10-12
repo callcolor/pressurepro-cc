@@ -5,6 +5,7 @@ import { Conference } from '@/types/conference';
 import { Input } from './ui/Input';
 import { Button } from './ui/Button';
 import { useUser } from '@/context/UserContext';
+import { useTranslations } from 'next-intl';
 
 interface RegistrationFormProps {
   conference: Conference;
@@ -12,6 +13,7 @@ interface RegistrationFormProps {
 }
 
 export function RegistrationForm({ conference, onSuccess }: RegistrationFormProps) {
+  const t = useTranslations('registration');
   const { registerForConference } = useUser();
   const [formData, setFormData] = useState({
     attendeeName: '',
@@ -25,13 +27,13 @@ export function RegistrationForm({ conference, onSuccess }: RegistrationFormProp
     const newErrors: Record<string, string> = {};
 
     if (!formData.attendeeName.trim()) {
-      newErrors.attendeeName = 'Name is required';
+      newErrors.attendeeName = t('nameRequired');
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('emailRequired');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Invalid email format';
+      newErrors.email = t('invalidEmail');
     }
 
     setErrors(newErrors);
@@ -59,7 +61,7 @@ export function RegistrationForm({ conference, onSuccess }: RegistrationFormProp
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to register');
+        throw new Error(data.error || t('registrationFailed'));
       }
 
       // Save registration to user context
@@ -87,10 +89,8 @@ export function RegistrationForm({ conference, onSuccess }: RegistrationFormProp
     return (
       <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
         <div className="text-4xl mb-4">✅</div>
-        <h3 className="text-xl font-bold text-green-800 mb-2">Registration Successful!</h3>
-        <p className="text-green-700">
-          You're all set for {conference.name}. Check your email for confirmation.
-        </p>
+        <h3 className="text-xl font-bold text-green-800 mb-2">{t('success')}</h3>
+        <p className="text-green-700">{t('successMessage', { conferenceName: conference.name })}</p>
       </div>
     );
   }
@@ -98,9 +98,9 @@ export function RegistrationForm({ conference, onSuccess }: RegistrationFormProp
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Input
-        label="Full Name"
+        label={t('fullName')}
         type="text"
-        placeholder="John Doe"
+        placeholder={t('fullNamePlaceholder')}
         value={formData.attendeeName}
         onChange={(e) => setFormData({ ...formData, attendeeName: e.target.value })}
         error={errors.attendeeName}
@@ -108,9 +108,9 @@ export function RegistrationForm({ conference, onSuccess }: RegistrationFormProp
       />
 
       <Input
-        label="Email Address"
+        label={t('email')}
         type="email"
-        placeholder="john@example.com"
+        placeholder={t('emailPlaceholder')}
         value={formData.email}
         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
         error={errors.email}
@@ -124,7 +124,7 @@ export function RegistrationForm({ conference, onSuccess }: RegistrationFormProp
       )}
 
       <Button type="submit" fullWidth disabled={loading}>
-        {loading ? 'Registering...' : 'Register Now'}
+        {loading ? t('registering') : t('registerNow')}
       </Button>
     </form>
   );

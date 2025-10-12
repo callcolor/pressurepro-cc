@@ -55,6 +55,7 @@ Visit [http://localhost:3000](http://localhost:3000)
 ## 📚 Documentation
 
 - **[PRISMA_SETUP.md](PRISMA_SETUP.md)** - Detailed Prisma and PostgreSQL setup guide
+- **[I18N_GUIDE.md](I18N_GUIDE.md)** - Internationalization (i18n) implementation guide
 - **[PROJECT_README.md](PROJECT_README.md)** - Original project documentation with technical details
 
 ## ✨ Features
@@ -101,6 +102,17 @@ Visit [http://localhost:3000](http://localhost:3000)
 - ✅ Optimized queries with indexing
 - ✅ Many-to-many category relationships
 
+### Internationalization (i18n)
+
+- ✅ Multi-language support (English, Spanish)
+- ✅ Dynamic language switching without page reload
+- ✅ All hard-coded strings extracted to translation files
+- ✅ Pluralization support
+- ✅ Interpolation for dynamic content
+- ✅ Easy to add new languages
+- ✅ SEO-friendly locale routing
+- ✅ Persistent language preference (cookies)
+
 ## 🛠 Technology Stack
 
 ### Frontend
@@ -116,10 +128,17 @@ Visit [http://localhost:3000](http://localhost:3000)
 - **NextJS API Routes** for serverless functions
 - **Server-side validation** and error handling
 
+### Internationalization
+- **next-intl** for i18n support
+- **2 languages** supported (English, Spanish)
+- **Dynamic language switching**
+- **Locale-aware routing**
+
 ### Development Tools
 - **ESLint** for code quality
 - **Prisma Studio** for database visualization
 - **tsx** for TypeScript execution
+- **Translation files** (JSON-based)
 
 ## 📁 Project Structure
 
@@ -341,10 +360,26 @@ This project is created for demonstration purposes.
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 
+## 🌍 Internationalization
+
+The application supports multiple languages:
+- **English (en)** - Default
+- **Spanish (es)** - Full translation
+
+### Adding a New Language
+
+1. Create translation file: `messages/{locale}.json`
+2. Add locale to `i18n/request.ts`
+3. Update language switcher
+4. Test thoroughly
+
+See [I18N_GUIDE.md](I18N_GUIDE.md) for detailed instructions.
+
 ## 📞 Support
 
 For detailed setup instructions:
 - See [PRISMA_SETUP.md](PRISMA_SETUP.md) for database setup
+- See [I18N_GUIDE.md](I18N_GUIDE.md) for i18n implementation
 - See [PROJECT_README.md](PROJECT_README.md) for project details
 
 ---

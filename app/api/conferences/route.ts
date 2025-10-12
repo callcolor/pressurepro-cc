@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
         isFeatured: body.isFeatured || false,
         speakers: body.speakers
           ? {
-              create: body.speakers.map((speaker: any) => ({
+              create: body.speakers.map((speaker: Prisma.SpeakerCreateInput) => ({
                 name: speaker.name,
                 title: speaker.title,
                 company: speaker.company,

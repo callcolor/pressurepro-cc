@@ -1,25 +1,24 @@
-'use client';
+ 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Conference } from '@/types/conference';
-import { Card, CardBody, CardHeader } from '@/components/ui/Card';
+import { Card, CardBody } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useUser } from '@/context/UserContext';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 
 export default function DashboardPage() {
+  const t = useTranslations('dashboard');
   const { preferences, unregisterFromConference, removeFavorite } = useUser();
   const [registeredConferences, setRegisteredConferences] = useState<Conference[]>([]);
   const [favoriteConferences, setFavoriteConferences] = useState<Conference[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchUserConferences();
-  }, [preferences]);
-
-  const fetchUserConferences = async () => {
+  const fetchUserConferences = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -45,7 +44,11 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [preferences]);
+
+  useEffect(() => {
+    fetchUserConferences();
+  }, [fetchUserConferences]);
 
   const getCountdown = (dateString: string): string => {
     const now = new Date();
@@ -100,8 +103,8 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Dashboard</h1>
-          <p className="text-gray-600">Manage your conference registrations and favorites</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('title')}</h1>
+          <p className="text-gray-600">{t('subtitle')}</p>
         </div>
 
         {/* Stats */}
@@ -161,14 +164,14 @@ export default function DashboardPage() {
             <Card>
               <CardBody className="text-center py-12">
                 <div className="text-4xl mb-4">📭</div>
-                <p className="text-gray-600 mb-4">You haven't registered for any conferences yet.</p>
+                <p className="text-gray-600 mb-4">{t('noRegistrations')}</p>
                 <Link href="/">
-                  <Button>Browse Conferences</Button>
+                  <Button>{t('browseConferences')}</Button>
                 </Link>
               </CardBody>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {registeredConferences.map((conference) => {
                 const registration = preferences.registeredConferences.find(
                   (reg) => reg.conferenceId === conference.id
@@ -179,11 +182,9 @@ export default function DashboardPage() {
                   <Card key={conference.id} hover>
                     <div className="relative h-40 bg-gray-200">
                       {conference.imageUrl ? (
-                        <img
-                          src={conference.imageUrl}
-                          alt={conference.name}
-                          className="w-full h-full object-cover"
-                        />
+                        <div className="relative w-full h-full">
+                          <Image src={conference.imageUrl} alt={conference.name} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 33vw" />
+                        </div>
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-400">
                           <span className="text-4xl">📊</span>
@@ -223,8 +224,8 @@ export default function DashboardPage() {
                       <div className="flex gap-2">
                         <Link href={`/conference/${conference.id}`} className="flex-1">
                           <Button size="sm" fullWidth>
-                            View Details
-                          </Button>
+                              {t('viewDetails')}
+                            </Button>
                         </Link>
                         <Button
                           size="sm"
@@ -247,12 +248,12 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">My Favorite Conferences</h2>
 
           {favoriteConferences.length === 0 ? (
-            <Card>
+                <Card>
               <CardBody className="text-center py-12">
                 <div className="text-4xl mb-4">🤍</div>
-                <p className="text-gray-600 mb-4">You haven't added any favorites yet.</p>
+                <p className="text-gray-600 mb-4">{t('noFavorites')}</p>
                 <Link href="/">
-                  <Button>Browse Conferences</Button>
+                  <Button>{t('browseConferences')}</Button>
                 </Link>
               </CardBody>
             </Card>
@@ -262,11 +263,9 @@ export default function DashboardPage() {
                 <Card key={conference.id} hover>
                   <div className="relative h-40 bg-gray-200">
                     {conference.imageUrl ? (
-                      <img
-                        src={conference.imageUrl}
-                        alt={conference.name}
-                        className="w-full h-full object-cover"
-                      />
+                      <div className="relative w-full h-full">
+                        <Image src={conference.imageUrl} alt={conference.name} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 33vw" />
+                      </div>
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-400">
                         <span className="text-4xl">📊</span>
