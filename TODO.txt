@@ -1,0 +1,48 @@
+
+
+Authentication
+    User login/auth
+    groups (user vs admin)
+    user/group conference relation
+    row based authentication?
+    Admin group CRUD for users
+
+Add tests!
+    unit vitest
+    integration with testcontainers (postgres)
+    responsive design with selenium/puppeteer/playwright
+    validate that all i18n code references resolve to valid messages
+        many strings still need to be added to i18n messages
+    aria labels on images/buttons/etc.
+
+SEO
+    Optimize per lighthouse report
+    validate meta tags
+
+Styling
+    Dark vs light mode
+    Add animations/transitions for better UX
+
+Conference list
+    List display mode (vs grid)
+    Add pagination or infinite scroll for large datasets
+
+Conference detail
+    Test social media buttons
+
+Conference create/edit
+    Test form validation and error handling
+    Suggest conference categories on new conference form
+    S3 bucket / image uploads
+    Ability to create/update speakers
+
+Dashboard
+    Add user profile management to /dashboard page
+
+Free database has very limited connections
+    NOT a production database 
+
+
+Add client-side caching?
+
+
