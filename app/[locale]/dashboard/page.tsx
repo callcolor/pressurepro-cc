@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { Conference } from '@/types/conference';
@@ -171,7 +171,7 @@ export default function DashboardPage() {
               </CardBody>
             </Card>
           ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {registeredConferences.map((conference) => {
                 const registration = preferences.registeredConferences.find(
                   (reg) => reg.conferenceId === conference.id
@@ -224,8 +224,8 @@ export default function DashboardPage() {
                       <div className="flex gap-2">
                         <Link href={`/conference/${conference.id}`} className="flex-1">
                           <Button size="sm" fullWidth>
-                              {t('viewDetails')}
-                            </Button>
+                            {t('viewDetails')}
+                          </Button>
                         </Link>
                         <Button
                           size="sm"
@@ -248,7 +248,7 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">My Favorite Conferences</h2>
 
           {favoriteConferences.length === 0 ? (
-                <Card>
+            <Card>
               <CardBody className="text-center py-12">
                 <div className="text-4xl mb-4">🤍</div>
                 <p className="text-gray-600 mb-4">{t('noFavorites')}</p>
@@ -296,7 +296,7 @@ export default function DashboardPage() {
                     <div className="flex gap-2">
                       <Link href={`/conference/${conference.id}`} className="flex-1">
                         <Button size="sm" fullWidth>
-                          View Details
+                          {t('viewDetails')}
                         </Button>
                       </Link>
                       <Button

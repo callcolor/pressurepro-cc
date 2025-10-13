@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 import { useState, useEffect, use, useCallback } from 'react';
 import { Conference } from '@/types/conference';
@@ -105,7 +105,7 @@ export default function ConferenceDetailPage({ params }: PageProps) {
   if (error || !conference) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">{t('conferenceNotFound') || 'Conference Not Found'}</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">{t('conferenceNotFound')}</h1>
         <p className="text-gray-600 mb-8">{error}</p>
         <Link href="/">
           <Button>{t('backToConferences')}</Button>
@@ -302,7 +302,7 @@ export default function ConferenceDetailPage({ params }: PageProps) {
               <Card>
                 <CardHeader>
                   <h2 className="text-xl font-bold text-gray-900">
-                    {userIsRegistered ? 'Already Registered' : 'Register Now'}
+                    {userIsRegistered ? t('registered') : t('register')}
                   </h2>
                 </CardHeader>
                 <CardBody>
@@ -310,7 +310,7 @@ export default function ConferenceDetailPage({ params }: PageProps) {
                     <div className="text-center py-4">
                       <div className="text-4xl mb-3">✅</div>
                       <p className="text-green-700 font-medium mb-4">
-                        {t('alreadyRegistered')}
+                        {t('registered')}
                       </p>
                       <Link href="/dashboard">
                         <Button fullWidth>View Dashboard</Button>

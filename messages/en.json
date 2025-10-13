@@ -114,7 +114,8 @@
     "hoursAway": "{hours} hour away",
     "hoursAway_plural": "{hours} hours away",
     "startingSoon": "Starting soon!",
-    "eventPassed": "Event has passed"
+    "eventPassed": "Event has passed",
+    "viewDetails": "View Details"
   },
   "admin": {
     "title": "Admin Panel",

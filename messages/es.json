@@ -114,7 +114,8 @@
     "hoursAway": "En {hours} hora",
     "hoursAway_plural": "En {hours} horas",
     "startingSoon": "¡Comienza pronto!",
-    "eventPassed": "El evento ya pasó"
+    "eventPassed": "El evento ya pasó",
+    "viewDetails": "Ver Detalles"
   },
   "admin": {
     "title": "Panel de Administración",
