@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
+import { updateConferenceEmbedding } from '@/lib/embeddings';
 
 // GET /api/conferences - Get all conferences with optional filtering
 export async function GET(request: NextRequest) {
@@ -146,14 +147,14 @@ export async function POST(request: NextRequest) {
         isFeatured: body.isFeatured || false,
         speakers: body.speakers
           ? {
-              create: body.speakers.map((speaker: Prisma.SpeakerCreateInput) => ({
-                name: speaker.name,
-                title: speaker.title,
-                company: speaker.company,
-                bio: speaker.bio,
-                avatarUrl: speaker.avatarUrl,
-              })),
-            }
+            create: body.speakers.map((speaker: Prisma.SpeakerCreateInput) => ({
+              name: speaker.name,
+              title: speaker.title,
+              company: speaker.company,
+              bio: speaker.bio,
+              avatarUrl: speaker.avatarUrl,
+            })),
+          }
           : undefined,
         categories: {
           create: categories.map((category) => ({
@@ -170,6 +171,8 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    updateConferenceEmbedding(conference);
 
     return NextResponse.json(conference, { status: 201 });
   } catch (error) {

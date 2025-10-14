@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { updateConferenceEmbedding } from '@/lib/embeddings';
 
 // GET /api/conferences/[id] - Get a single conference
 export async function GET(
@@ -107,6 +108,8 @@ export async function PUT(
         },
       },
     });
+
+    updateConferenceEmbedding(conference);
 
     return NextResponse.json(conference);
   } catch (error) {

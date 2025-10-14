@@ -1,6 +1,4 @@
 {
-    "cSpell.words": [
-        "pravatar",
-        "pressurepro"
-    ]
+  "editor.formatOnSave": true,
+  "cSpell.words": ["cuid", "pravatar", "pressurepro"]
 }
