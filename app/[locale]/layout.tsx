@@ -1,27 +1,27 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "../globals.css";
-import { UserProvider } from "@/context/UserContext";
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import '../globals.css';
+import { UserProvider } from '@/context/UserContext';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import { Link } from "@/i18n/navigation";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Link } from '@/i18n/navigation';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { notFound } from 'next/navigation';
 import { locales } from '@/i18n/locales';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-  title: "Tech Conference Explorer",
-  description: "Discover and manage upcoming tech conferences",
+  title: 'Tech Conference Explorer',
+  description: 'Discover and manage upcoming tech conferences',
 };
 
 type Props = {
