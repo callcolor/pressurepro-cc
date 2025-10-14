@@ -217,7 +217,7 @@ export default function AdminPage() {
                                 <div className="font-medium text-blue-600">${conference.price}</div>
                               </div>
                               <div className="text-sm">
-                                <span className="text-gray-500">{t('conference.attendees').split('{')[0] || 'Attendees'}:</span>
+                                <span className="text-gray-500">{t('common.attendees').split('{')[0] || 'Attendees'}:</span>
                                 <div className="font-medium">{conference.currentAttendees} / {conference.maxAttendees}</div>
                               </div>
                             </div>

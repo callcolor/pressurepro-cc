@@ -17,7 +17,8 @@
     "yes": "Sí",
     "no": "No",
     "close": "Cerrar",
-    "submit": "Enviar"
+    "submit": "Enviar",
+    "attendees": "asistentes"
   },
   "nav": {
     "conferences": "Conferencias",
@@ -55,7 +56,7 @@
   "conference": {
     "featured": "Destacada",
     "attendees": "{current} / {max} asistentes",
-    "price": "${price}",
+    "price": "Precio",
     "viewDetails": "Ver Detalles",
     "register": "Registrarse Ahora",
     "registered": "Ya Registrado",
