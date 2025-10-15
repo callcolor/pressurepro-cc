@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 import React from 'react';
 import { Link } from '@/i18n/navigation';
@@ -10,9 +10,10 @@ import { Button } from './ui/Button';
 import { useUser } from '@/context/UserContext';
 import { getRegistrationStatus } from '@/hooks/useConferenceValidator';
 import { useTranslations } from 'next-intl';
+import { Optional } from '@/types/utilities';
 
 interface ConferenceCardProps {
-  conference: Conference;
+  conference: Optional<Conference, 'category' | 'speakers'>;
 }
 
 export function ConferenceCard({ conference }: ConferenceCardProps) {
@@ -111,12 +112,12 @@ export function ConferenceCard({ conference }: ConferenceCardProps) {
           </div>
 
           <div className="mt-3 flex flex-wrap gap-1">
-            {conference.category.slice(0, 3).map((cat) => (
+            {conference.category?.slice(0, 3).map((cat) => (
               <Badge key={cat} variant="info" size="sm">
                 {cat}
               </Badge>
             ))}
-            {conference.category.length > 3 && (
+            {conference.category && conference.category?.length > 3 && (
               <Badge variant="default" size="sm">
                 +{conference.category.length - 3}
               </Badge>

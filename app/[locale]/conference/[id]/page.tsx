@@ -12,6 +12,7 @@ import { useConferenceValidator, getRegistrationStatus } from '@/hooks/useConfer
 import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { ConferenceCard } from '@/components/ConferenceCard';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -21,6 +22,7 @@ export default function ConferenceDetailPage({ params }: PageProps) {
   const t = useTranslations('conference');
   const resolvedParams = use(params);
   const [conference, setConference] = useState<Conference | null>(null);
+  const [similarConferences, setSimilarConferences] = useState<Conference[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
@@ -48,9 +50,26 @@ export default function ConferenceDetailPage({ params }: PageProps) {
     }
   }, [resolvedParams.id]);
 
+  const fetchSimilarConferences = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/conferences/${resolvedParams.id}/similar`);
+
+      if (!response.ok) {
+        throw new Error('Conference not found');
+      }
+
+      const data = await response.json();
+      setSimilarConferences(data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    }
+  }, [resolvedParams.id]);
+
   useEffect(() => {
     fetchConference();
-  }, [fetchConference]);
+    fetchSimilarConferences();
+  }, [fetchConference, fetchSimilarConferences]);
 
   const handleFavoriteToggle = () => {
     if (!conference) return;
@@ -132,7 +151,7 @@ export default function ConferenceDetailPage({ params }: PageProps) {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 mb-6">
             {/* Hero Image */}
             <Card>
               <div className="relative h-80 bg-gray-200">
@@ -297,7 +316,7 @@ export default function ConferenceDetailPage({ params }: PageProps) {
           </div>
 
           {/* Sidebar - Registration */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 mb-6">
             <div className="sticky top-4">
               <Card>
                 <CardHeader>
@@ -355,6 +374,20 @@ export default function ConferenceDetailPage({ params }: PageProps) {
             </div>
           </div>
         </div>
+
+        {similarConferences.length > 0 && (<Card>
+          <CardHeader>
+            <h2 className="text-xl font-bold text-gray-900">Similar Conferences</h2>
+          </CardHeader>
+          <CardBody>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {similarConferences.map((conference) => (
+                <ConferenceCard key={conference.id} conference={conference} />
+              ))}
+            </div>
+          </CardBody>
+        </Card>)}
+
       </div>
     </div>
   );

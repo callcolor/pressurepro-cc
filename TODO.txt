@@ -6,6 +6,7 @@ Authentication
     user/group conference relation
     row based authentication?
     Admin group CRUD for users
+    CRUD for categories
 
 Add tests!
     unit vitest
@@ -44,5 +45,7 @@ Free database has very limited connections
 
 
 Add client-side caching?
-
-
+Extract duplicate logic from api/conferences into conferences service
+Strictly type API responses
+Create reusable pagination type
+SEO Friendly slugs for conference detail pages

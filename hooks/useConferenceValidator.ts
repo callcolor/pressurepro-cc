@@ -96,7 +96,7 @@ export function useConferenceValidator(conference: Conference | null): Conferenc
 /**
  * Helper function to get registration status based on conference data
  */
-export function getRegistrationStatus(conference: Conference): 'Open' | 'Closed' | 'Sold Out' {
+export function getRegistrationStatus(conference: Pick<Conference, 'date' | 'maxAttendees' | 'currentAttendees'>): 'Open' | 'Closed' | 'Sold Out' {
   const conferenceDate = new Date(conference.date);
   const today = new Date();
   today.setHours(0, 0, 0, 0);

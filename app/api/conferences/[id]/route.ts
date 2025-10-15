@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { updateConferenceEmbedding } from '@/lib/embeddings';
+import { transformConferenceDetail } from '../transformConference';
 
 // GET /api/conferences/[id] - Get a single conference
 export async function GET(
@@ -26,20 +27,7 @@ export async function GET(
     }
 
     // Transform data to match frontend interface
-    const transformed = {
-      id: conference.id,
-      name: conference.name,
-      description: conference.description,
-      date: conference.date.toISOString().split('T')[0],
-      location: conference.location,
-      price: conference.price,
-      category: conference.categories.map((c) => c.category.name),
-      imageUrl: conference.imageUrl,
-      speakers: conference.speakers,
-      maxAttendees: conference.maxAttendees,
-      currentAttendees: conference.currentAttendees,
-      isFeatured: conference.isFeatured,
-    };
+    const transformed = transformConferenceDetail(conference);
 
     return NextResponse.json(transformed);
   } catch (error) {
